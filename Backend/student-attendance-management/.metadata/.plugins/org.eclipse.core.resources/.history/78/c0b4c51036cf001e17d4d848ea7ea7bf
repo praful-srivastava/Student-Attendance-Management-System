@@ -1,0 +1,9 @@
+package com.cdac.project.attendancemanagement.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.cdac.project.attendancemanagement.dto.TeacherResponseDTO;
+
+public interface TeacherResponseDTORepository  extends  JpaRepository<TeacherResponseDTO, Long>{
+
+}

@@ -1,0 +1,78 @@
+package com.cdac.project.attendancemanagement.service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cdac.project.attendancemanagement.exception.ResourceNotFoundException;
+import com.cdac.project.attendancemanagement.model.Attendance;
+import com.cdac.project.attendancemanagement.model.Session;
+import com.cdac.project.attendancemanagement.model.Student;
+import com.cdac.project.attendancemanagement.repository.AttendanceRepository;
+import com.cdac.project.attendancemanagement.repository.SessionRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class AttendanceService {
+	
+	@Autowired
+	private AttendanceRepository attrepo;
+	//private SessionRepository sessionrepo;
+	
+	public List<Attendance> getAllAttendance(){
+		return attrepo.findAll();
+	}
+	
+	public List<Attendance> getAllAttendanceOfSession(Long sessionId) throws ResourceNotFoundException {
+//	    Session session = sessionrepo.findById(sessionId)
+//	        .orElseThrow(() -> new ResourceNotFoundException("Session not found with id " + sessionId));
+	    return attrepo.findBySession(sessionId);
+	}
+	
+	public List<Attendance> getAttendanceByStudentId(Long studentId) {
+        return attrepo.findByStudentId(studentId);
+    }
+//	public Attendance markAttendance(Attendance attendance) {
+//        return attrepo.save(attendance);
+//    }
+//	public List<Attendance> markAttendanceBySession(Long sessionId, List<Long> studentIds) {
+//        List<Attendance> attendances = new ArrayList<>();
+//        for (Long studentId : studentIds) {
+//            Attendance attendance = new Attendance();
+//            attendance.setSessionId(sessionId);
+//            attendance.setStudentId(studentId);
+//            // Set other fields as needed
+//            attrepo.save(attendance);
+//            attendances.add(attendance);
+//        }
+//        return attendances;
+//    }
+	
+	public Attendance markAttendance(Long sessionId, Long studentId, boolean present) {
+        Attendance attendance = new Attendance();
+        Session session = new Session();
+        session.setSessionId(sessionId);
+        attendance.setSession(session);
+        Student student = new Student();
+        student.setSId(studentId);
+        attendance.setStudent(student);
+        attendance.setPresent(present);
+        
+        attendance.setDate(new Date());
+        
+        return attrepo.save(attendance);
+    }	
+
+	    public List<Attendance> getAllAttendances() {
+	        return attrepo.findAll();
+	    }
+	    
+    public void deleteAttendance(long attendanceId) {
+        attrepo.deleteById(attendanceId);
+    }
+}

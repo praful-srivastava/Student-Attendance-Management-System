@@ -1,0 +1,100 @@
+package com.cdac.project.attendancemanagement.controller;
+
+import java.util.List;
+
+import org.apache.catalina.connector.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cdac.project.attendancemanagement.exception.ResourceNotFoundException;
+import com.cdac.project.attendancemanagement.model.Attendance;
+import com.cdac.project.attendancemanagement.model.Session;
+import com.cdac.project.attendancemanagement.model.Teacher;
+import com.cdac.project.attendancemanagement.repository.AttendanceRepository;
+import com.cdac.project.attendancemanagement.service.AttendanceService;
+import com.cdac.project.attendancemanagement.service.TeacherService;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
+@CrossOrigin(origins = "http://localhost:3000")
+@RestController
+@RequestMapping(value="/api/teacher")
+public class TeacherController {
+	
+	@Autowired
+	private TeacherService tservice;
+	
+	@Autowired
+	private AttendanceService attservice;
+	@PostMapping("/register")
+	public ResponseEntity<String> addTeacher(@Validated @RequestBody Teacher teacher){
+		try {
+			Session session = teacher.getSession();
+			
+			session.setTeacher(teacher);
+			teacher.setSession(session);
+			
+			Teacher registerTeacher = tservice.registerteacher(teacher);
+			if(registerTeacher != null) {
+				return ResponseEntity.ok("Registeration Successful");
+			}
+			else {
+				return ResponseEntity.badRequest().body("Registeration failed");
+			}
+		}
+		catch(Exception e){
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An Error Occurred"+ e.getMessage());
+		}
+	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<Boolean> loginTeacher(@Validated @RequestBody Teacher teacher) throws ResourceNotFoundException{
+		Boolean isAuthenticated = false;
+		String email = teacher.getEmail();
+		String password = teacher.getPassword();
+		
+		Teacher t = tservice.loginTeacher(email).orElseThrow();
+		if(email.equals(t.getEmail()) && password.equals(t.getPassword())) {
+			isAuthenticated = true;
+		}
+		return ResponseEntity.ok(isAuthenticated);
+	}
+	
+	@GetMapping("/teachers")
+    public List<Teacher> getAllTeachers() {
+        return tservice.getAllTeachers();
+    }
+	@DeleteMapping("/delete{teacherId}")
+	private void deleteTeacher(Long teacherId) {
+		tservice.deleteteacher(teacherId);
+	}
+	@DeleteMapping("/delete/{email}")
+	private void deleteTeacherByEmail(String email) {
+		tservice.deleteteacherByEmail(email);
+	}
+	
+//	@GetMapping("/attendance/{sessionId}")
+//    public List<Attendance> getAttendanceBySessionId(@PathVariable Long sessionId) {
+//        return tservice.getAttendanceBySessionId(sessionId);
+//    }
+	
+	@GetMapping("/attendance")
+	public List<Attendance> getAttenadnace() {
+		return attservice.getAllAttendance() ;
+	}
+	
+	
+	
+	
+}

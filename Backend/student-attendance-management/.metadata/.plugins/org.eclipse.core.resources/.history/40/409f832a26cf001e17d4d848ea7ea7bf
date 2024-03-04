@@ -1,0 +1,18 @@
+package com.cdac.project.attendancemanagement.model;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+
+
+@Entity
+public class SessionDto {
+    @Id
+	private Long id;
+    private String module_name;
+    private LocalDateTime date;
+    
+    // Constructors, getters, and setters
+}

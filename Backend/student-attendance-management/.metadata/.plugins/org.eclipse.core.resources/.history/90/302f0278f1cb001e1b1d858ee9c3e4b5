@@ -1,0 +1,31 @@
+package com.cdac.project.attendancemanagement.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cdac.project.attendancemanagement.model.Attendance;
+import com.cdac.project.attendancemanagement.repository.AttendanceRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class AttendanceService {
+	
+	@Autowired
+	private AttendanceRepository attrepo;
+	
+	public List<Attendance> getAllAttendance(){
+		return attrepo.findAll();
+	}
+	
+	public Attendance createAttendance(Attendance attendance) {
+        return attrepo.save(attendance);
+    }
+
+    public void deleteAttendance(Long attendanceId) {
+        attrepo.deleteById(attendanceId);
+    }
+}

@@ -1,0 +1,42 @@
+package com.cdac.project.attendancemanagement.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cdac.project.attendancemanagement.exception.ResourceNotFoundException;
+import com.cdac.project.attendancemanagement.model.Attendance;
+import com.cdac.project.attendancemanagement.model.Session;
+import com.cdac.project.attendancemanagement.repository.AttendanceRepository;
+import com.cdac.project.attendancemanagement.repository.SessionRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class AttendanceService {
+	
+	@Autowired
+	private AttendanceRepository attrepo;
+	private SessionRepository sessionrepo;
+	
+	public List<Attendance> getAllAttendance(){
+		return attrepo.findAll();
+	}
+	
+	public List<Attendance> getAllAttendanceOfSession(Long sessionId) throws ResourceNotFoundException {
+	    Session session = sessionrepo.findById(sessionId)
+	        .orElseThrow(() -> new ResourceNotFoundException("Session not found with id " + sessionId));
+	    return attrepo.findBySession(session);
+	}
+
+	
+	public Attendance createAttendance(Attendance attendance) {
+        return attrepo.save(attendance);
+    }
+
+    public void deleteAttendance(Long attendanceId) {
+        attrepo.deleteById(attendanceId);
+    }
+}

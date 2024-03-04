@@ -1,0 +1,33 @@
+// TeacherRequest.java
+//package com.cdac.project.attendancemanagement.controller;
+
+import com.cdac.project.attendancemanagement.model.Teacher;
+
+public class TeacherDto {
+    private String moduleName;
+    private Teacher teacher;
+
+    // Constructors, getters, and setters
+    public TeacherDto() {}
+
+    public TeacherDto(String moduleName, Teacher teacher) {
+        this.moduleName = moduleName;
+        this.teacher = teacher;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+}

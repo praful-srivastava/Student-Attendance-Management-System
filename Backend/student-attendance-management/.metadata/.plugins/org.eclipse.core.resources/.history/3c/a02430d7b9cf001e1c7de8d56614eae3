@@ -1,0 +1,147 @@
+package com.cdac.project.attendancemanagement.service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cdac.project.attendancemanagement.dto.AttendanceDTO;
+import com.cdac.project.attendancemanagement.exception.ResourceNotFoundException;
+import com.cdac.project.attendancemanagement.model.Attendance;
+import com.cdac.project.attendancemanagement.model.Session;
+import com.cdac.project.attendancemanagement.model.Student;
+import com.cdac.project.attendancemanagement.repository.AttendanceRepository;
+import com.cdac.project.attendancemanagement.repository.SessionRepository;
+import com.cdac.project.attendancemanagement.repository.StudentRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class AttendanceService {
+	
+	@Autowired
+	private AttendanceRepository attrepo;
+	@Autowired
+	private SessionRepository sessionrepo;
+	
+	@Autowired
+    private StudentRepository studentRepository;
+	
+	public List<Attendance> getAllAttendance(){
+		return attrepo.findAll();
+	}
+	
+	public List<Attendance> getAllAttendanceOfSession(Long sessionId) throws ResourceNotFoundException {
+//	    Session session = sessionrepo.findById(sessionId)
+//	        .orElseThrow(() -> new ResourceNotFoundException("Session not found with id " + sessionId));
+	    return attrepo.findBySessionId(sessionId);
+	}
+	
+	public List<Attendance> getAttendanceByStudentId(Long studentId) {
+	    return attrepo.findByStudentSId(studentId);
+	}
+
+//	public Attendance markAttendance(Attendance attendance) {
+//        return attrepo.save(attendance);
+//    }
+//	public List<Attendance> markAttendanceBySession(Long sessionId, List<Long> studentIds) {
+//        List<Attendance> attendances = new ArrayList<>();
+//        for (Long studentId : studentIds) {
+//            Attendance attendance = new Attendance();
+//            attendance.setSessionId(sessionId);
+//            attendance.setStudentId(studentId);
+//            // Set other fields as needed
+//            attrepo.save(attendance);
+//            attendances.add(attendance);
+//        }
+//        return attendances;
+//    }
+	
+//	public Attendance markAttendance(Long sessionId, Long studentId, boolean present) {
+//        Attendance attendance = new Attendance();
+//        Session session = new Session();
+//        session.setId(sessionId);
+//        attendance.setSession(session);
+//        Student student = new Student();
+//        student.setSId(studentId);
+//        attendance.setStudent(student);
+//        attendance.setPresent(present);
+//        
+//        attendance.setDate(new Date());
+//        
+//        return attrepo.save(attendance);
+//    }	
+
+	    public List<Attendance> getAllAttendances() {
+	        return attrepo.findAll();
+	    }
+	    
+    public void deleteAttendance(long attendanceId) {
+        attrepo.deleteById(attendanceId);
+    }
+
+	public List<Attendance> getAttendanceBySessionId(Long sessionId) {
+		
+		return attrepo.findBySessionId(sessionId);
+	}
+
+//	public void markAttendance(List<AttendanceDTO> attendanceData) {
+//        for (AttendanceDTO dto : attendanceData) {
+//            // Fetch session and student entities
+//            Session session = sessionrepo.findById(dto.getSessionId()).orElse(null);
+//            Student student = studentRepository.findById(dto.getStudentId()).orElse(null);
+//            
+//            if (session != null && student != null) {
+//                Attendance attendance = new Attendance();
+//                attendance.setSession(session);
+//                attendance.setStudent(student);
+//                attendance.setDate(dto.getDate());
+//                attendance.setPresent(dto.getStatus().equalsIgnoreCase("present")); // Assuming status is either "present" or "absent"
+//                attrepo.save(attendance);
+//            }
+//        }
+//    }
+
+	
+	public void markAttendance(List<AttendanceDTO> attendanceData) {
+        for (AttendanceDTO dto : attendanceData) {
+            try {
+                Attendance attendance = new Attendance();
+                
+                // Set session and student
+                Session session = sessionrepo.findById(Long.parseLong(dto.getSessionId()))
+                        .orElseThrow(() -> new ResourceNotFoundException("Session not found with id " + dto.getSessionId()));
+
+                attendance.setSession(session);
+                
+                Student student = studentRepository.findById(dto.getStudentId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + dto.getStudentId()));
+                
+                attendance.setStudent(student);
+                
+                // Set other fields
+                attendance.setDate(new Date());
+                attendance.setPresent(dto.getStatus().equalsIgnoreCase("present")); // Assuming status is either "present" or "absent"
+                
+                // Save the attendance record
+                attrepo.save(attendance);
+            } catch (NumberFormatException e) {
+                // Handle invalid session ID format
+                // Log the error or handle it according to your application's requirements
+                System.err.println("Invalid session ID format: " + dto.getSessionId());
+            } catch (ResourceNotFoundException e) {
+                // Handle resource not found exceptions
+                // Log the error or handle it according to your application's requirements
+                System.err.println(e.getMessage());
+            } catch (Exception e) {
+                // Handle any other unexpected exceptions
+                // Log the error or handle it according to your application's requirements
+                System.err.println("An unexpected error occurred: " + e.getMessage());
+            }
+        }
+    }
+	
+}

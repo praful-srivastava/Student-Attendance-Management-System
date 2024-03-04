@@ -1,0 +1,5 @@
+package com.cdac.project.attendancemanagement.repository;
+
+public interface TeacherResponseDTORepository {
+
+}

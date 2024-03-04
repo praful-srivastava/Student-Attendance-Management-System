@@ -1,0 +1,76 @@
+package com.cdac.project.attendancemanagement.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cdac.project.attendancemanagement.model.Admin;
+import com.cdac.project.attendancemanagement.model.Teacher;
+import com.cdac.project.attendancemanagement.repository.AdminRepository;
+import com.cdac.project.attendancemanagement.repository.TeacherRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+@Transactional
+public class AdminService {
+	
+	
+	@Autowired
+	private AdminRepository arepo;
+	private TeacherRepository teacherRepository;
+	
+	
+	public List<Admin> getAllAdmins(){
+		return arepo.findAll();
+	}
+	
+
+	public Admin registerAdmin(Admin a) {
+		return arepo.save(a);
+	}
+	
+	public void approveTeacherRegistration(Long teacherId) {
+	    Optional<Teacher> teacherOptional = teacherRepository.findById(teacherId);
+	    if (teacherOptional.isPresent()) {
+	        Teacher teacher = teacherOptional.get();
+	        teacher.setStatus("Approved");
+	        teacherRepository.save(teacher);
+	    } else {
+	        throw new RuntimeException("Teacher not found with ID: " + teacherId);
+	    }
+	}
+
+    public void rejectTeacherRegistration(Long teacherId) {
+        Optional<Teacher> teacherOptional = teacherRepository.findById(teacherId);
+           	if (teacherOptional.isPresent()) {
+                Teacher teacher = teacherOptional.get();
+                teacher.setStatus("Rejected");
+                teacherRepository.save(teacher);
+            } else {
+                throw new RuntimeException("Teacher not found with ID: " + teacherId);
+            }
+    }
+
+//	
+//	public Optional<Admin> loginAdmin(String email){
+//		
+//		return arepo.findByEmail(email);
+//	}
+//	
+//	public Admin updateAdmin(Long id, Admin adminDetails) {
+//        Admin admin = arepo.findById(id).orElse(null);
+//        if (admin != null) {
+//            admin.setEmail(adminDetails.getEmail());
+//            admin.setPassword(adminDetails.getPassword());
+//            return arepo.save(admin);
+//        }
+//        return null;
+//	}
+	
+	public void deleteAdmin(Long id) {
+		arepo.deleteById(id);
+	}
+}
